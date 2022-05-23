@@ -32,20 +32,21 @@
 
 
 
-class Stock:
+#class Stock:
 
 
-class Stock1(Stock):
+#class Stock1(Stock):
 
-class Stock2(Stock):
+#class Stock2(Stock):
 
-class Stock3(Stock):
+#class Stock3(Stock):
 
 
-class Warehouse:
+#class Warehouse:
 
 
 
 
 
 if __name__ == "__main__":
+    print("Hello world")

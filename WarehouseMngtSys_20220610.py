@@ -40,14 +40,14 @@
     #Create a report of all the stock available in the wearhouse.
 
 #TO DO:
-# minimum capacity of warehouse
 # change get_report output from list to dict?
 # exceptions handling
 # input parameters
 # create unittest
 
 
-
+import argparse
+from ast import Break
 
 class Product:
     '''Base class of generic product type'''
@@ -121,6 +121,7 @@ class Warehouse:
             watermelons: it's an object
             return: None
         '''
+        assert (maximum_capacity > 0), "maximum_capacity has to be greater than 0"
         self.maximum_capacity = maximum_capacity
         self.pineapples = Pineapples()
         self.oranges = Oranges()
@@ -129,27 +130,26 @@ class Warehouse:
     def check_spare_capacity(self):
         return self.maximum_capacity - sum([self.__dict__[i].__dict__['current_amount'] for i in list(self.__dict__.keys())[1:]])
 
-    def add_stock(self,stock_type: str, quantity: int) -> int:  #what data type is stock_type? str? object?
+    def add_stock(self,stock_type: object, quantity: int) -> int:  
         '''adds amount to current amount of stock type
             
             returns updated current amount
         '''
-        if self.check_spare_capacity() >= quantity:
-            stock_type.current_amount += quantity
-        else:
-            raise ValueError("Unable to process: Maximum capacity would be exceeded")
+        assert (quantity > 0), "Quantity has to be greater than 0"
+        assert (self.check_spare_capacity() >= quantity), "Unable to process: Maximum capacity would be exceeded"
+        stock_type.current_amount += quantity
+        
 
-    def remove_stock(self,stock_type: str, quantity: int) -> int:
+    def remove_stock(self,stock_type: object, quantity: int) -> int:
         '''removes amount to current amount of stock type
             
             returns updated current amount
         '''
-        if stock_type.current_amount >= quantity:
-            stock_type.current_amount -= quantity
-        else:
-            raise ValueError("Unable to process: Requested capacity is not available")
+        assert (quantity > 0), "Quantity has to be greater than 0"
+        assert (stock_type.current_amount >= quantity), "Unable to process: Requested capacity is not available"
+        stock_type.current_amount -= quantity
 
-    def get_stock_amount(self,stock_type: str) -> int:
+    def get_stock_amount(self,stock_type: object) -> int:
         '''returns current amount of stock type
         '''
         return stock_type.current_amount
@@ -176,31 +176,36 @@ class Warehouse:
         '''
         return [(i, self.__dict__[i].__dict__['current_amount']) for i in list(self.__dict__.keys())[1:]]
 
-
-
-
     
-
-
 
 if __name__ == "__main__":
-    x = Warehouse(100)
-    x.add_stock(x.pineapples, 10)
-    x.add_stock(x.oranges, 20)
-    x.add_stock(x.watermelons, 12)
-    #x.remove_stock(x.pineapples, 3)
-    #print(x.pineapples.current_amount)
-    #print(x.is_stock_available(x.strawberries,3))
-    print(x.get_report())
-    print(type(x.get_report()))
-    print(type(x.get_report()[0]))
-
-
-    '''print('a' > 'b')
-    print('pine' > 'pinel')
-    print(sorted(list(x.__dict__.keys())[1:]))'''
-
-    #print(x.binary_search('pinepples'))
-    #print(x.binary_search_prod('melons'))
-    #print(sum([x.__dict__[i].__dict__['current_amount'] for i in list(x.__dict__.keys())[1:]]))
-    
+    #FIXME: make maximum_capacity required and remove default value
+    parser = argparse.ArgumentParser(
+          description="This program takes 1 argument: Maximum capacity of the warehouse")
+    parser.add_argument('-maximum_capacity', '-max_cap',default=1002, type=int, required=False, help='Maximum capacity warehouse')
+    argument_list = parser.parse_args()
+    x = Warehouse(argument_list.maximum_capacity)
+    while True:
+        try:
+            next_step = input("What do you want to do next: add_stock,remove_stock,get_stock_amount,binary_search_prod,get_report,exit ? ")
+            match next_step:
+                case 'add_stock':
+                    which_stock = input('Which stock do you want to add: pineapples,oranges,watermelons ? ')
+                    quantity  = int(input('Quantity? '))
+                    x.add_stock(getattr(x, which_stock),quantity)
+                case 'remove_stock':
+                    which_stock = input('Which stock do you want to remove: pineapples,oranges,watermelons ? ')
+                    quantity  = int(input('Quantity? '))
+                    x.remove_stock(getattr(x, which_stock),quantity)
+                case 'get_stock_amount':
+                    which_stock = input('For which stock do you want the amount: pineapples,oranges,watermelons ? ')
+                    print(x.get_stock_amount(getattr(x, which_stock)))
+                case 'binary_search_prod':
+                    which_stock = input('Which stock do you want to search: pineapples,oranges,watermelons ? ')
+                    print(x.binary_search_prod(which_stock))
+                case 'get_report':
+                    print(x.get_report())
+                case 'exit':
+                    break
+        except Exception as e:
+            print(e)

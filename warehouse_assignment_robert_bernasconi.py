@@ -23,17 +23,11 @@
 # SOFTWARE.
 
 
-# Conceptual Specifications
-
-
-# Technical Specifications
-
-# Architectur/execution model
 
 #MAYBE:
 #FIFO
 #expiration date
-#array() instead of quantity
+#array() instead of amount
 #Have two wearhouses were the stock can be shared between them.
 
 #Optional extra functionality included:
@@ -47,40 +41,39 @@
 
 
 import argparse
-from ast import Break
 
 class Product:
     '''Base class of generic product type'''
-    def __init__(self,current_amount: int = 0) -> None:
+    def __init__(self,amount: int = 0) -> None:
         '''Initialization function
-            current_amount: it's an int
+            amount: it's an int
             return: None
         '''
-        self.current_amount = current_amount
+        self.amount = amount
 
-class Pineapples(Product):
-    '''Inheritance class to define Pineapples as unique product/ stock type'''
+class Phones(Product):
+    '''Inheritance class to define Phones as unique product/ stock type'''
     def __init__(self) -> None:
         '''Initialization function
-            current_amount of Pineapples: it's an int
-            return: None
-        '''
-        super().__init__()
-
-class Oranges(Product):
-    '''Inheritance class to define Oranges as unique product/ stock type'''
-    def __init__(self) -> None:
-        '''Initialization function
-            current_amount of Oranges: it's an int
+            amount of Phones: it's an int
             return: None
         '''
         super().__init__()
 
-class Watermelons(Product) :
-    '''Inheritance class to define Watermelons as unique product/ stock type'''
+class Watches(Product):
+    '''Inheritance class to define Watches as unique product/ stock type'''
     def __init__(self) -> None:
         '''Initialization function
-            current_amount of Watermelons: it's an int
+            amount of Watches: it's an int
+            return: None
+        '''
+        super().__init__()
+
+class Computers(Product) :
+    '''Inheritance class to define Computers as unique product/ stock type'''
+    def __init__(self) -> None:
+        '''Initialization function
+            amount of Computers: it's an int
             return: None
         '''
         super().__init__()
@@ -93,20 +86,21 @@ class Warehouse:
         The maximum capacity of the Warehouse
     stock_type: object
         The type of stock to operate on
-    quantity: int
+    units: int
         The amount of units to make an operation with
-    requested_quantity: int
+    requested_units: int
         The amount of units that is checked for retrival availablitiy
     
     Methods
     -------
-    add_stock(stock_type, quantity)
-        adds stock quantity to current stock amount
-    remove_stock(stock_type, quantity)
-        removes stock quantity to current stock amount
+    # FIXME: check_spare_capacity and CHANGE NAME is_stock_available
+    add_stock(stock_type, units)
+        adds stock units to current stock amount
+    remove_stock(stock_type, units)
+        removes stock units to current stock amount
     get_stock_amount(stock_type)
         returns current stock amount
-    is_stock_available(stock_type,requested_quantity)
+    is_stock_available(stock_type,requested_units)
         returns boolean value for whether requested stock amount of stock type is available for retrival
     get_report()
         returns a report with each stock type in store together with their current amount
@@ -116,43 +110,43 @@ class Warehouse:
         '''Initialization function
             maximum_capacity: it's an int
                 The maximum capacity of the Warehouse
-            pineapples: it's an object
-            oranges: it's an object
-            watermelons: it's an object
+            phones: it's an object
+            watches: it's an object
+            computers: it's an object
             return: None
         '''
         assert (maximum_capacity > 0), "maximum_capacity has to be greater than 0"
         self.maximum_capacity = maximum_capacity
-        self.pineapples = Pineapples()
-        self.oranges = Oranges()
-        self.watermelons = Watermelons()
+        self.phones = Phones()
+        self.watches = Watches()
+        self.computers = Computers()
 
-    def check_spare_capacity(self):
-        return self.maximum_capacity - sum([self.__dict__[i].__dict__['current_amount'] for i in list(self.__dict__.keys())[1:]])
+    def get_free_capacity(self):
+        return self.maximum_capacity - sum([self.__dict__[i].__dict__['amount'] for i in list(self.__dict__.keys())[1:]])
 
-    def add_stock(self,stock_type: object, quantity: int) -> int:  
+    def add_stock(self,stock_type: object, units: int) -> int:  
         '''adds amount to current amount of stock type
             
-            returns updated current amount
+            returns updated amount
         '''
-        assert (quantity > 0), "Quantity has to be greater than 0"
-        assert (self.check_spare_capacity() >= quantity), "Unable to process: Maximum capacity would be exceeded"
-        stock_type.current_amount += quantity
+        assert (units > 0), "Units has to be greater than 0"
+        assert (self.get_free_capacity() >= units), "Unable to process: Maximum capacity would be exceeded"
+        stock_type.amount += units
         
 
-    def remove_stock(self,stock_type: object, quantity: int) -> int:
+    def remove_stock(self,stock_type: object, units: int) -> int:
         '''removes amount to current amount of stock type
             
             returns updated current amount
         '''
-        assert (quantity > 0), "Quantity has to be greater than 0"
-        assert (stock_type.current_amount >= quantity), "Unable to process: Requested capacity is not available"
-        stock_type.current_amount -= quantity
+        assert (units > 0), "Units has to be greater than 0"
+        assert (stock_type.amount >= units), "Unable to process: Requested capacity is not available"
+        stock_type.amount -= units
 
     def get_stock_amount(self,stock_type: object) -> int:
         '''returns current amount of stock type
         '''
-        return stock_type.current_amount
+        return stock_type.amount
 
     def binary_search_prod(self, product_searched: str) -> bool:
         product_searched = product_searched.lower()
@@ -161,20 +155,20 @@ class Warehouse:
         c_index = int(len(input_list)/2.0)
         while c_index != 0 and c_index != l_list:
             if input_list[c_index] == product_searched:
-                return product_searched, self.__dict__[product_searched].__dict__['current_amount']
+                return product_searched, self.__dict__[product_searched].__dict__['amount']
             elif product_searched > input_list[c_index]:
                 c_index = l_list - int((l_list-c_index)/2)
             else:
                 c_index = int((c_index)/2)
         if input_list[c_index] == product_searched:
-                return product_searched, self.__dict__[product_searched].__dict__['current_amount']
+                return product_searched, self.__dict__[product_searched].__dict__['amount']
         raise ValueError("Search term not available\nSelect one of the following:\n{}".format(input_list))
         
 
     def get_report(self) -> list:
         '''returns a report with each stock type in store together with their current amount
         '''
-        return [(i, self.__dict__[i].__dict__['current_amount']) for i in list(self.__dict__.keys())[1:]]
+        return [(i, self.__dict__[i].__dict__['amount']) for i in list(self.__dict__.keys())[1:]]
 
     
 
@@ -182,26 +176,27 @@ if __name__ == "__main__":
     #FIXME: make maximum_capacity required and remove default value
     parser = argparse.ArgumentParser(
           description="This program takes 1 argument: Maximum capacity of the warehouse")
-    parser.add_argument('-maximum_capacity', '-max_cap',default=1002, type=int, required=False, help='Maximum capacity warehouse')
+    parser.add_argument('-maximum_capacity', '-max_cap', type=int, required=True, help='Maximum capacity warehouse') #default=1000
     argument_list = parser.parse_args()
     x = Warehouse(argument_list.maximum_capacity)
+
     while True:
         try:
             next_step = input("What do you want to do next: add_stock,remove_stock,get_stock_amount,binary_search_prod,get_report,exit ? ")
             match next_step:
                 case 'add_stock':
-                    which_stock = input('Which stock do you want to add: pineapples,oranges,watermelons ? ')
-                    quantity  = int(input('Quantity? '))
-                    x.add_stock(getattr(x, which_stock),quantity)
+                    which_stock = input('Which stock do you want to add: phones,watches,computers ? ')
+                    units  = int(input('Units? '))
+                    x.add_stock(getattr(x, which_stock),units)
                 case 'remove_stock':
-                    which_stock = input('Which stock do you want to remove: pineapples,oranges,watermelons ? ')
-                    quantity  = int(input('Quantity? '))
-                    x.remove_stock(getattr(x, which_stock),quantity)
+                    which_stock = input('Which stock do you want to remove: phones,watches,computers ? ')
+                    units  = int(input('Units? '))
+                    x.remove_stock(getattr(x, which_stock),units)
                 case 'get_stock_amount':
-                    which_stock = input('For which stock do you want the amount: pineapples,oranges,watermelons ? ')
+                    which_stock = input('For which stock do you want the amount: phones,watches,computers ? ')
                     print(x.get_stock_amount(getattr(x, which_stock)))
                 case 'binary_search_prod':
-                    which_stock = input('Which stock do you want to search: pineapples,oranges,watermelons ? ')
+                    which_stock = input('Which stock do you want to search: phones,watches,computers ? ')
                     print(x.binary_search_prod(which_stock))
                 case 'get_report':
                     print(x.get_report())

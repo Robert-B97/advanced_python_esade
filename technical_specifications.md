@@ -54,8 +54,16 @@ All the functions are, as previously mentioned, created inside the class Warehou
     This function returns a report (a list of tuples) with each stock type considered in the warehouse management system as well as their current amount (it also display product whose amount is 0)
 
 ## Testing
+The use of assertions help controlling unintended behaviours whenever the wrong input doesn't automatically raise an error (e.g. the argument for add_stock is a negative intger).
 
-## Deployment
+## Terminal Execution
+1. When running the file the user will need to pass the argument '-maximum_capacity/-max_cap' representing the capacity of the warehouse object that is being instantiated.
+2. A while loop will ask the user to input the next step (which function to use from the displayed ones)
+3. Based on the action (e.g. add_stock) the program will ask for to input the specific arguments required (e.g. stock_type and units)
+4. After the action is performed, it will return to the beginning of the loop asking for the next step
+5. TERMINATION: if 'exit' is selected as next step, the loop ends and the program stop running
+
+- If there is an exception/error raised by a wrong input, the user will be sent back to the beginning of the loop where he's asked for the next step.
 
 
 

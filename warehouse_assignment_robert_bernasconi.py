@@ -28,7 +28,7 @@
 #FIFO
 #expiration date
 #array() instead of amount
-#Have two wearhouses were the stock can be shared between them.
+#Have two wearhouses were the stock can be shared between them. (send_stock)
 
 #Optional extra functionality included:
     #Create a report of all the stock available in the wearhouse.
@@ -170,7 +170,7 @@ class Warehouse:
         '''
         return [(i, self.__dict__[i].__dict__['amount']) for i in list(self.__dict__.keys())[1:]]
 
-    
+   
 
 if __name__ == "__main__":
     #FIXME: make maximum_capacity required and remove default value
